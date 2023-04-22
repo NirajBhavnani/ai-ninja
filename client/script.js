@@ -91,6 +91,32 @@ const handleSubmit = async (e) => {
 
   // turn on the loader
   loader(messageDiv);
+
+  // fetch data from server -> bot's response
+  const response = await fetch("http://localhost:5000", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      prompt: data.get("prompt"), //data coming from textarea on the screen
+    }),
+  });
+  clearInterval(loadInterval);
+  messageDiv.innerHTML = "";
+
+  if (response.ok) {
+    const resData = await response.json();
+    const parsedData = resData.bot.trim();
+
+    typeText(messageDiv, parsedData);
+  } else {
+    const err = await response.text();
+
+    messageDiv.innerHTML = "Something went wrong";
+    alert(err);
+    console.log(err);
+  }
 };
 
 form.addEventListener("submit", handleSubmit);
